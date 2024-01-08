@@ -1,9 +1,9 @@
-use dr2g27::common::leds::LEDS;
-use dr2g27::common::util::{minimize_window, set_title, DR2G27Result, G27_PID, G27_VID};
-use hidapi::{HidApi, HidDevice, HidDeviceInfo};
-use std::net::UdpSocket;
-use std::thread::sleep;
-use std::time::Duration;
+use dr2g27::common::{
+    leds::LEDS,
+    util::{DR2G27Result, G27_PID, G27_VID},
+};
+use hidapi::{HidApi, HidDevice};
+use std::{net::UdpSocket, thread::sleep, time::Duration};
 
 // Telemetry config "hardware_settings_config.xml"
 // <udp enabled="true" extradata="3" ip="127.0.0.1" port="20777" delay="1" />
@@ -19,9 +19,9 @@ fn read_telemetry_and_update(device: HidDevice) -> DR2G27Result {
     }
 }
 
-fn device_connected(devices: &Vec<HidDeviceInfo>) -> bool {
-    for device in devices {
-        if device.product_id == G27_PID && device.vendor_id == G27_VID {
+fn device_connected(hid: &HidApi) -> bool {
+    for device in hid.device_list() {
+        if device.product_id() == G27_PID && device.vendor_id() == G27_VID {
             return true;
         }
     }
@@ -30,13 +30,13 @@ fn device_connected(devices: &Vec<HidDeviceInfo>) -> bool {
 }
 
 fn connect_and_bridge() -> DR2G27Result {
-    set_title("> Disconnected");
+    println!("# Looking for G27");
     let mut hid = HidApi::new()?;
 
     loop {
-        if device_connected(hid.devices()) {
+        if device_connected(&hid) {
             if let Ok(device) = hid.open(G27_VID, G27_PID) {
-                set_title("> Connected");
+                println!("# G27 connected");
                 read_telemetry_and_update(device)?;
             }
         }
@@ -47,11 +47,9 @@ fn connect_and_bridge() -> DR2G27Result {
 }
 
 fn main() {
-    minimize_window();
-
     loop {
         if let Err(error) = connect_and_bridge() {
-            set_title(&format!("> {:?}", error));
+            println!("# {:?}", error);
         }
 
         sleep(Duration::from_secs(1));

@@ -1,7 +1,7 @@
 [package]
 name = "dr2g27"
-version = "0.1.0"
-edition = "2018"
+version = "1.0.1"
+edition = "2021"
 build = "src/dr2g27/build.rs"
 
 [lib]
@@ -13,10 +13,7 @@ name = "dr2g27"
 path = "src/dr2g27/main.rs"
 
 [dependencies]
-hidapi = "1.1.0"
+hidapi = "2.4.1"
 
-[target.'cfg(windows)'.dependencies]
-winapi = {version = "0.3.8", features = ["wincon", "winuser"]}
-
-[target.'cfg(target_os="windows")'.build-dependencies]
-winres = "0.1.11"
+[build-dependencies]
+windows_exe_info = "0.4.1"
