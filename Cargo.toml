@@ -1,0 +1,19 @@
+[package]
+name = "dr2g27"
+version = "1.0.1"
+edition = "2021"
+build = "src/dr2g27/build.rs"
+
+[lib]
+name = "dr2g27"
+path = "src/lib.rs"
+
+[[bin]]
+name = "dr2g27"
+path = "src/dr2g27/main.rs"
+
+[dependencies]
+hidapi = "2.4.1"
+
+[build-dependencies]
+windows_exe_info = "0.4.1"
